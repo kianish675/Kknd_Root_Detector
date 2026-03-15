@@ -31,7 +31,7 @@ jobs:
           sdkmanager --install "cmdline-tools;latest"
 
       - name: Build
-        run: ./gradlew assembleDebug --stacktrace --no-daemon
+        run: gradlew assembleDebug --stacktrace --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:

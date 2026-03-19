@@ -2,7 +2,6 @@ package com.juanma0511.rootdetector.ui
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -20,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -110,7 +110,7 @@ fun HwHeroCard(
         scanResult.warnCount > 0 -> MaterialTheme.colorScheme.tertiary
         else -> Color(0xFF2E7D32)
     }
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val containerColor = when {
         scanResult == null      -> if (isDark) Color(0xFF0D1B2E) else Color(0xFFDCE8FF)
         scanResult.failCount > 0 -> if (isDark) Color(0xFF2E0A0A) else Color(0xFFFFDAD6)
@@ -141,7 +141,7 @@ fun HwHeroCard(
                     .size(88.dp)
                     .scale(iconScale)
                     .clip(CircleShape)
-                    .background(statusColor.copy(alpha = 0.15f))
+                    .background(statusColor.copy(alpha = if (isDark) 0.24f else 0.12f))
             ) {
                 Icon(
                     imageVector = when {
@@ -247,7 +247,7 @@ fun HwSummaryRow(result: HwScanResult) {
 @Composable
 fun HwCheckCard(item: HwCheckItem) {
     var expanded by remember { mutableStateOf(false) }
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     
     val statusColor = when (item.status) {
         CheckStatus.PASS    -> Color(0xFF2E7D32)
@@ -261,10 +261,10 @@ fun HwCheckCard(item: HwCheckItem) {
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
             containerColor = when (item.status) {
-                CheckStatus.PASS    -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isDark) 0.25f else 0.4f)
-                CheckStatus.WARN    -> MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = if (isDark) 0.25f else 0.35f)
-                CheckStatus.FAIL    -> MaterialTheme.colorScheme.errorContainer.copy(alpha = if (isDark) 0.25f else 0.35f)
-                CheckStatus.UNKNOWN -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isDark) 0.18f else 0.3f)
+                CheckStatus.PASS    -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isDark) 0.32f else 0.4f)
+                CheckStatus.WARN    -> MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = if (isDark) 0.22f else 0.35f)
+                CheckStatus.FAIL    -> MaterialTheme.colorScheme.errorContainer.copy(alpha = if (isDark) 0.22f else 0.35f)
+                CheckStatus.UNKNOWN -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isDark) 0.24f else 0.3f)
             }
         ),
         elevation = CardDefaults.cardElevation(0.dp),
@@ -279,7 +279,7 @@ fun HwCheckCard(item: HwCheckItem) {
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(statusColor)
+                        .background(statusColor.copy(alpha = if (isDark) 0.85f else 0.65f))
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     Text(item.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
@@ -292,7 +292,7 @@ fun HwCheckCard(item: HwCheckItem) {
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                Surface(shape = RoundedCornerShape(6.dp), color = statusColor.copy(alpha = 0.15f)) {
+                Surface(shape = RoundedCornerShape(6.dp), color = statusColor.copy(alpha = if (isDark) 0.24f else 0.15f)) {
                     Text(
                         when (item.status) {
                             CheckStatus.PASS    -> "PASS"
@@ -336,7 +336,7 @@ fun HwCheckCard(item: HwCheckItem) {
                     }
                     item.detail?.let {
                         Spacer(Modifier.height(4.dp))
-                        Surface(shape = RoundedCornerShape(8.dp), color = statusColor.copy(alpha = 0.1f)) {
+                        Surface(shape = RoundedCornerShape(8.dp), color = statusColor.copy(alpha = if (isDark) 0.18f else 0.1f)) {
                             Text(
                                 it,
                                 modifier = Modifier.padding(8.dp),

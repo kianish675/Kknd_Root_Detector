@@ -2,7 +2,6 @@ package com.juanma0511.rootdetector.ui
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -84,7 +84,7 @@ fun StatusHeroCard(
         else -> Color(0xFF2E7D32)
     }
 
-    val isDark = isSystemInDarkTheme()
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val containerColor = when {
         scanResult == null  -> if (isDark) Color(0xFF0D1B2E) else Color(0xFFDCE8FF)
         scanResult.isRooted -> if (isDark) Color(0xFF2E0A0A) else Color(0xFFFFDAD6)
@@ -116,7 +116,7 @@ fun StatusHeroCard(
                     .size(88.dp)
                     .scale(iconScale)
                     .clip(CircleShape)
-                    .background(statusColor.copy(alpha = 0.15f))
+                    .background(statusColor.copy(alpha = if (isDark) 0.24f else 0.12f))
             ) {
                 Icon(
                     imageVector = when {
@@ -229,7 +229,8 @@ fun SummaryRow(result: ScanResult) {
 
 @Composable
 fun SummaryChip(label: String, color: Color, modifier: Modifier = Modifier) {
-    Surface(modifier = modifier, shape = RoundedCornerShape(12.dp), color = color.copy(alpha = 0.12f)) {
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    Surface(modifier = modifier, shape = RoundedCornerShape(12.dp), color = color.copy(alpha = if (isDark) 0.2f else 0.12f)) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 10.dp)) {
             Text(label, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = color)
         }
@@ -239,6 +240,7 @@ fun SummaryChip(label: String, color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun DetectionItemCard(item: DetectionItem) {
     var expanded by remember { mutableStateOf(false) }
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
 
     val severityColor = when (item.severity) {
         Severity.HIGH   -> MaterialTheme.colorScheme.error
@@ -251,8 +253,8 @@ fun DetectionItemCard(item: DetectionItem) {
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (item.detected)
-                severityColor.copy(alpha = 0.06f)
-            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                severityColor.copy(alpha = if (isDark) 0.14f else 0.06f)
+            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isDark) 0.32f else 0.5f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         onClick = {
@@ -269,8 +271,8 @@ fun DetectionItemCard(item: DetectionItem) {
                         .size(40.dp)
                         .clip(CircleShape)
                         .background(
-                            if (item.detected) severityColor.copy(alpha = 0.15f)
-                            else MaterialTheme.colorScheme.surfaceVariant
+                            if (item.detected) severityColor.copy(alpha = if (isDark) 0.24f else 0.15f)
+                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (isDark) 0.7f else 1f)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -302,8 +304,8 @@ fun DetectionItemCard(item: DetectionItem) {
 
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = if (item.detected) severityColor.copy(alpha = 0.15f)
-                            else Color(0xFF2E7D32).copy(alpha = 0.12f)
+                    color = if (item.detected) severityColor.copy(alpha = if (isDark) 0.24f else 0.15f)
+                            else Color(0xFF2E7D32).copy(alpha = if (isDark) 0.2f else 0.12f)
                 ) {
                     Text(
                         if (item.detected) "FOUND" else "PASS",

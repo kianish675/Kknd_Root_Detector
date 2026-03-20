@@ -51,6 +51,11 @@ fun SettingsScreen(
                     val intent = Intent(Intent.ACTION_VIEW,
                         Uri.parse("https://github.com/juanma0511"))
                     context.startActivity(intent)
+                },
+                onOukaroGithubClick = {
+                    val intent = Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/OukaroMF"))
+                    context.startActivity(intent)
                 }
             )
         }
@@ -179,7 +184,10 @@ fun ThemeChip(
 }
 
 @Composable
-fun CreditsCard(onGithubClick: () -> Unit) {
+fun CreditsCard(
+    onGithubClick: () -> Unit,
+    onOukaroGithubClick: () -> Unit
+) {
     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
         Row(
@@ -227,6 +235,56 @@ fun CreditsCard(onGithubClick: () -> Unit) {
             Spacer(Modifier.width(8.dp))
             Text(
                 "github.com/juanma0511",
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp
+            )
+        }
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                modifier = Modifier.size(52.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Text("OMF", style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary)
+                }
+            }
+
+            Column {
+                Text(
+                    "OukaroMF",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    "Junior Designer ~ Meow",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        OutlinedButton(
+            onClick = onOukaroGithubClick,
+            modifier = Modifier.fillMaxWidth().height(44.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(
+                Icons.Outlined.Code,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                "github.com/OukaroMF",
                 fontWeight = FontWeight.Medium,
                 fontSize = 14.sp
             )

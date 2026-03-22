@@ -20,7 +20,8 @@ class RootDetector(private val context: Context) {
         "/data/local/su", "/data/local/bin/su", "/data/local/xbin/su",
         "/system/sd/xbin/su", "/system/bin/failsafe/su", "/cache/recovery/su",
         "/data/adb/su", "/data/local/tmp/su", "/system/app/Superuser.apk",
-        "/system/etc/init.d/99SuperSUDaemon", "/system/xbin/sugote"
+        "/system/etc/init.d/99SuperSUDaemon", "/system/xbin/sugote", 
+        "/system/bin/resetprop.sh"
     )
 
     private val rootPackages = listOf(
@@ -137,6 +138,7 @@ class RootDetector(private val context: Context) {
             ::checkPropertyConsistency,
             ::checkHideBypassModules,
             ::checkHiddenMagiskModules
+            ::checkOneUIPort
         )
         val items = mutableListOf<DetectionItem>()
         val total = checks.size + 1 
@@ -1318,3 +1320,4 @@ class RootDetector(private val context: Context) {
         ))
     }
 }
+

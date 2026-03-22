@@ -1321,36 +1321,31 @@ class RootDetector(private val context: Context) {
     }
 }
 
-private fun checkOneUiPort(): List<DetectionItem> {
-    val build = Build.DISPLAY ?: ""
-    val baseband = try {
+private fun checkOneUIPort(): List<DetectionItem> {
+    fun getPropSafe(key: String): String = try {
         val c = Class.forName("android.os.SystemProperties")
         val m = c.getMethod("get", String::class.java, String::class.java)
-        m.invoke(null, "gsm.version.baseband", "") as String
+        m.invoke(null, key, "") as String
     } catch (_: Exception) { "" }
 
-    fun last14(s: String): String {
-        return if (s.length >= 14) s.takeLast(14) else s
-    }
+    val incremental = getPropSafe("ro.system.build.version.incremental")
+    val baseband = getPropSafe("gsm.version.baseband")
 
-    val buildPart = last14(build)
-    val basebandPart = last14(baseband)
-
-    val mismatch = buildPart.isNotEmpty() &&
-                   basebandPart.isNotEmpty() &&
-                   !buildPart.equals(basebandPart, ignoreCase = true)
+    val mismatch = incremental.isNotEmpty() &&
+                   baseband.isNotEmpty() &&
+                   !baseband.contains(incremental, ignoreCase = true)
 
     val detail = if (mismatch) {
-        "build=$buildPart\nbaseband=$basebandPart"
+        "incremental=$incremental\nbaseband=$baseband"
     } else null
 
     return listOf(
         det(
             "oneuip",
-            "OneUI Build & Baseband Mismatch",
+            "Baseband and incremental",
             DetectionCategory.CUSTOM_ROM,
-            Severity.HIGH,
-            "Checks if last 14 chars of build number match baseband",
+            Severity.MEDIUM,
+            "Checks if system incremental version aligns with baseband",
             mismatch,
             detail
         )

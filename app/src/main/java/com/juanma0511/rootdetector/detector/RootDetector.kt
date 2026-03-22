@@ -166,10 +166,36 @@ class RootDetector(private val context: Context) {
         val (regularFound, _) = splitOplusMatches(found)
         return listOf(det(
             "su_binary", "SU Binary Paths", DetectionCategory.SU_BINARIES, Severity.HIGH,
-            "Checks for su binary in 17 known root paths",
+            "Checks for su binary in multiple known root paths",
             regularFound.isNotEmpty(), regularFound.joinToString("\n").ifEmpty { null }
         ))
     }
+
+    private fun checkOneUIPort(): List<DetectionItem> {
+    val incremental = getProp("ro.system.build.version.incremental")
+    val baseband = getProp("gsm.version.baseband")
+
+    val validData = incremental.isNotEmpty() && baseband.isNotEmpty()
+
+    val mismatch = validData &&
+            !baseband.lowercase().endsWith(incremental.lowercase())
+
+    val detail = if (mismatch) {
+        "incremental=$incremental\nbaseband=$baseband"
+    } else null
+
+    return listOf(
+        det(
+            "oneuip",
+            "Baseband and incremental",
+            DetectionCategory.CUSTOM_ROM,
+            Severity.MEDIUM,
+            "Checks if system incremental version aligns with baseband",
+            mismatch,
+            detail
+        )
+    )
+}
 
     private fun checkRootPackages(): List<DetectionItem> {
         val pm = context.packageManager
@@ -1319,35 +1345,4 @@ class RootDetector(private val context: Context) {
             indicators.isNotEmpty(), indicators.joinToString("\n").ifEmpty { null }
         ))
     }
-}
-
-private fun checkOneUIPort(): List<DetectionItem> {
-    fun getPropSafe(key: String): String = try {
-        val c = Class.forName("android.os.SystemProperties")
-        val m = c.getMethod("get", String::class.java, String::class.java)
-        m.invoke(null, key, "") as String
-    } catch (_: Exception) { "" }
-
-    val incremental = getPropSafe("ro.system.build.version.incremental")
-    val baseband = getPropSafe("gsm.version.baseband")
-
-    val mismatch = incremental.isNotEmpty() &&
-                   baseband.isNotEmpty() &&
-                   !baseband.contains(incremental, ignoreCase = true)
-
-    val detail = if (mismatch) {
-        "incremental=$incremental\nbaseband=$baseband"
-    } else null
-
-    return listOf(
-        det(
-            "oneuip",
-            "Baseband and incremental",
-            DetectionCategory.CUSTOM_ROM,
-            Severity.MEDIUM,
-            "Checks if system incremental version aligns with baseband",
-            mismatch,
-            detail
-        )
-    )
 }

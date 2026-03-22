@@ -138,7 +138,7 @@ class RootDetector(private val context: Context) {
             ::checkPropertyConsistency,
             ::checkHideBypassModules,
             ::checkHiddenMagiskModules,
-            ::checkOneUIPort
+            ::checkBasebandIncremental
         )
         val items = mutableListOf<DetectionItem>()
         val total = checks.size + 1 
@@ -171,9 +171,13 @@ class RootDetector(private val context: Context) {
         ))
     }
 
-    private fun checkOneUIPort(): List<DetectionItem> {
+    private fun checkBasebandIncremental(): List<DetectionItem> {
     val incremental = getProp("ro.system.build.version.incremental")
     val baseband = getProp("gsm.version.baseband")
+    .split(",")
+    .map { it.trim() }
+    .firstOrNull()
+    .orEmpty()
 
     val validData = incremental.isNotEmpty() && baseband.isNotEmpty()
 
@@ -186,7 +190,7 @@ class RootDetector(private val context: Context) {
 
     return listOf(
         det(
-            "oneuip",
+            "basebandincremental",
             "Baseband and incremental",
             DetectionCategory.CUSTOM_ROM,
             Severity.MEDIUM,
